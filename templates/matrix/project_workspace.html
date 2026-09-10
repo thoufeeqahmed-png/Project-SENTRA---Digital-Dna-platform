@@ -1,0 +1,726 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ project.title }} // Project DNA Workspace</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/workspace.css' %}">
+
+  <style>
+    .stage-nav-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .stage-nav-pill:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-elevated);
+    }
+    .stage-nav-pill.active {
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+      border-color: rgba(0, 240, 255, 0.4);
+    }
+    .step-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .step-card.completed {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.04);
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .step-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-elevated);
+      color: var(--accent-cyan);
+    }
+    .step-card.completed .step-badge {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-emerald);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="brand-section">
+      <a href="/" style="text-decoration: none; color: inherit;" class="brand-logo">
+        <div class="logo-badge">DNA</div>
+        <div class="brand-titles">
+          <div class="brand-title">SYNTHEX // DNA MATRIX</div>
+          <div class="brand-sub">Project Workspace</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Active Project Title Throughout Workspace -->
+    <div class="header-meta">
+      <div class="active-project-pill">
+        <span class="status-dot"></span>
+        <span id="header-project-name" style="font-weight: 700; color: var(--text-primary);">{{ project.title }}</span>
+        <span style="color: var(--text-muted);">&bull;</span>
+        <span class="tag tag-cyan" style="font-size: 10px;">{{ project.project_type }}</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Synthesize Project Action Button -->
+      <button class="btn btn-primary" id="btn-synthesize-project" onclick="synthesizeProject()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <span id="synthesize-btn-text">{% if project.is_synthesized %}Re-Synthesize Architecture{% else %}Synthesize Project{% endif %}</span>
+      </button>
+
+      <button class="btn btn-outline" id="btn-toggle-voice" onclick="toggleVoiceOutput()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        Voice On
+      </button>
+
+      <a href="/projects/" class="btn btn-outline" style="text-decoration: none;">Projects</a>
+    </div>
+  </header>
+
+  <!-- Workspace Grid Layout -->
+  <main class="app-workspace">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="workspace-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Project Stages</div>
+      </div>
+
+      <div class="project-list-container" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <button class="stage-nav-pill active" onclick="switchSection('overview')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          1. Overview & DNA
+        </button>
+        <button class="stage-nav-pill" onclick="switchSection('digital-dna')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          2. Digital DNA Graph
+        </button>
+        <button class="stage-nav-pill" onclick="switchSection('architecture')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          3. System Architecture
+        </button>
+        <button class="stage-nav-pill" onclick="switchSection('feasibility')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+          4. Feasibility Matrix
+        </button>
+        <button class="stage-nav-pill" onclick="switchSection('build-plan')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          5. Build Plan Roadmap
+        </button>
+        <button class="stage-nav-pill" onclick="switchSection('ai-assistant')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          6. Project AI Assistant
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Synthesis Status</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="status-dot" style="{% if not project.is_synthesized %}background:#f59e0b; box-shadow:0 0 8px #f59e0b;{% endif %}"></span>
+          <span id="synthesis-badge" style="font-size: 11px; font-weight: 600; color: var(--text-primary);">
+            {% if project.is_synthesized %}SYNTHESIS COMPLETE{% else %}READY TO SYNTHESIZE{% endif %}
+          </span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Stage Content -->
+    <section class="workspace-stage">
+      <div class="stage-viewport" style="overflow-y: auto;">
+
+        <!-- 1. SECTION: OVERVIEW & DNA SUMMARY -->
+        <div class="workspace-section active" id="sec-overview" style="padding: 30px; max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+          
+          <!-- Executive Header -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <span class="tag tag-cyan">{{ project.project_type }}</span>
+              <span class="score-tag">{{ project.feasibility_score }}% Feasibility Score</span>
+            </div>
+            <h1 style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin-bottom: 8px;">{{ project.title }}</h1>
+            <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">{{ project.summary }}</p>
+          </div>
+
+          <!-- Problem & Goal Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent-rose); margin-bottom: 8px;">Problem Statement</div>
+              <p style="font-size: 13px; color: var(--text-primary); line-height: 1.5;">{{ project.problem_statement }}</p>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent-emerald); margin-bottom: 8px;">Target Objective & Goal</div>
+              <p style="font-size: 13px; color: var(--text-primary); line-height: 1.5;">{{ project.goal }}</p>
+            </div>
+          </div>
+
+          <!-- Structured Project DNA Breakdown -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 2 19.07 4.93 19.07 19.07 12 22 4.93 19.07 4.93 4.93 12 2"></polygon></svg>
+              Project DNA Genetic Codons
+            </h3>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+              <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-sm);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 6px;">Inputs</div>
+                <ul style="padding-left: 16px; font-size: 12px; color: var(--text-secondary);">
+                  {% for item in project.dna_data.inputs %}
+                  <li>{{ item }}</li>
+                  {% empty %}
+                  <li>Telemetry / User Actions</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-sm);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase; margin-bottom: 6px;">Outputs</div>
+                <ul style="padding-left: 16px; font-size: 12px; color: var(--text-secondary);">
+                  {% for item in project.dna_data.outputs %}
+                  <li>{{ item }}</li>
+                  {% empty %}
+                  <li>Command Actuations</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-sm);">
+                <div style="font-size: 11px; font-weight: 700; color: #a78bfa; text-transform: uppercase; margin-bottom: 6px;">Software Stack</div>
+                <ul style="padding-left: 16px; font-size: 12px; color: var(--text-secondary);">
+                  {% for item in project.dna_data.software %}
+                  <li>{{ item }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-sm);">
+                <div style="font-size: 11px; font-weight: 700; color: #fbbf24; text-transform: uppercase; margin-bottom: 6px;">Hardware & Compute</div>
+                <ul style="padding-left: 16px; font-size: 12px; color: var(--text-secondary);">
+                  {% for item in project.dna_data.hardware %}
+                  <li>{{ item }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+
+            <!-- Logic & Workflow -->
+            <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Execution Decision Logic:</span>
+                <p style="font-size: 13px; color: var(--text-primary); margin-top: 4px;">{{ project.dna_data.logic }}</p>
+              </div>
+              <div>
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">End-to-End Workflow Pipeline:</span>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">{{ project.dna_data.workflow }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Action Stage Prompt -->
+          <div style="background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">Next Stage: Synthesize System Architecture</div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Map component relationships, data flow sequences, and decision logic.</div>
+            </div>
+            <button class="btn btn-primary" onclick="synthesizeProject()">
+              ⚡ Synthesize Project Now
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 2. SECTION: DIGITAL DNA INTERACTIVE GRAPH -->
+        <div class="workspace-section" id="sec-digital-dna" style="display: none; height: 100%; position: relative;">
+          <div class="canvas-wrapper" style="cursor: grab;">
+            <canvas id="dna-canvas-element" style="width: 100%; height: 100%; display: block;"></canvas>
+
+            <!-- Canvas Floating Controls -->
+            <div class="canvas-floating-controls">
+              <button class="btn btn-outline btn-icon" id="btn-zoom-in">+</button>
+              <span class="zoom-indicator" id="canvas-zoom-text">100%</span>
+              <button class="btn btn-outline btn-icon" id="btn-zoom-out">-</button>
+              <button class="btn btn-outline" id="btn-zoom-reset">1:1</button>
+              <button class="btn btn-outline" id="btn-zoom-fit">Fit</button>
+            </div>
+
+            <!-- Node Detail Inspector Drawer -->
+            <div class="node-inspector-drawer" id="node-inspector">
+              <div class="inspector-header">
+                <div>
+                  <div id="inspector-node-name" style="font-size: 15px; font-weight: 700; color: var(--text-primary);">Component</div>
+                  <div id="inspector-node-category" style="font-size: 11px; color: var(--accent-cyan); font-family: var(--font-mono);">Category</div>
+                </div>
+                <button class="btn btn-outline btn-icon" onclick="closeInspector()">&times;</button>
+              </div>
+              <div class="inspector-body">
+                <div class="detail-section">
+                  <span class="detail-label">Purpose</span>
+                  <p id="inspector-node-purpose" style="font-size: 13px; color: var(--text-primary);"></p>
+                </div>
+                <div class="detail-section">
+                  <span class="detail-label">Technical Description</span>
+                  <p id="inspector-node-desc" style="font-size: 13px; color: var(--text-secondary);"></p>
+                </div>
+                <div class="detail-section">
+                  <span class="detail-label">Inputs</span>
+                  <div class="tag-cloud" id="inspector-inputs"></div>
+                </div>
+                <div class="detail-section">
+                  <span class="detail-label">Outputs</span>
+                  <div class="tag-cloud" id="inspector-outputs"></div>
+                </div>
+                <div class="detail-section">
+                  <span class="detail-label">Technologies</span>
+                  <div class="tag-cloud" id="inspector-tech"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. SECTION: SYSTEM ARCHITECTURE -->
+        <div class="workspace-section" id="sec-architecture" style="display: none; padding: 30px; max-width: 1000px; margin: 0 auto;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary);">Generated System Architecture</h2>
+            <span class="tag tag-cyan">{% if project.is_synthesized %}Synthesized{% else %}Draft DNA{% endif %}</span>
+          </div>
+
+          <!-- Architecture Data Flow Sequence Card -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px; margin-bottom: 20px;">
+            <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 14px;">
+              Component Data Flow Sequence
+            </h4>
+            <div id="arch-data-flow-list" style="display: flex; flex-direction: column; gap: 10px;">
+              {% for comp in project.components.all %}
+              <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-surface-elevated); padding: 12px 16px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-cyan);">
+                <span style="font-family: var(--font-mono); font-size: 12px; color: var(--accent-emerald);">0{{ forloop.counter }}</span>
+                <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);">{{ comp.name }}</span>
+                <span class="tag" style="font-size: 10px;">{{ comp.category }}</span>
+                <span style="color: var(--text-muted); font-size: 12px; margin-left: auto;">&rarr; {{ comp.outputs.0|default:"Stream" }}</span>
+              </div>
+              {% empty %}
+              <div style="color: var(--text-muted); font-size: 13px;">Click "Synthesize Project" to generate full component flow.</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Next Button -->
+          <button class="btn btn-outline" onclick="switchSection('feasibility')" style="width: 100%; padding: 12px;">
+            Next Stage: Check Feasibility Matrix &rarr;
+          </button>
+        </div>
+
+        <!-- 4. SECTION: FEASIBILITY MATRIX -->
+        <div class="workspace-section" id="sec-feasibility" style="display: none; padding: 30px; max-width: 1000px; margin: 0 auto;">
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px;">Engineering Feasibility Matrix</h2>
+
+          <div style="display: grid; grid-template-columns: 280px 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="score-card">
+              <span class="detail-label">Viability Index</span>
+              <div class="score-radial">{{ project.feasibility_score }}%</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Technical Feasibility</div>
+            </div>
+
+            <div class="metrics-breakdown">
+              <div class="metric-row">
+                <span style="font-size: 12px; font-weight: 600;">Technical Complexity: <span style="color: var(--accent-cyan);">{{ project.feasibility_details.complexity|default:"Moderate" }}</span></span>
+              </div>
+              <div class="metric-row">
+                <span style="font-size: 12px; font-weight: 600;">Hardware Dependencies: <span style="color: var(--text-primary);">{{ project.feasibility_details.hardware|default:"Standard Cloud / Edge" }}</span></span>
+              </div>
+              <div class="metric-row">
+                <span style="font-size: 12px; font-weight: 600;">Software Tooling: <span style="color: var(--accent-emerald);">{{ project.feasibility_details.software|default:"Available Open-Source" }}</span></span>
+              </div>
+              <div class="metric-row">
+                <span style="font-size: 12px; font-weight: 600;">Data Constraints: <span style="color: var(--text-secondary);">{{ project.feasibility_details.data_requirements|default:"Schema-defined records" }}</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Architectural Assessment</div>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">{{ project.feasibility_summary }}</p>
+          </div>
+
+          <button class="btn btn-outline" onclick="switchSection('build-plan')" style="width: 100%; padding: 12px;">
+            Next Stage: View Build Plan Roadmap &rarr;
+          </button>
+        </div>
+
+        <!-- 5. SECTION: BUILD PLAN (REAL PROGRESS & MARK COMPLETE) -->
+        <div class="workspace-section" id="sec-build-plan" style="display: none; padding: 30px; max-width: 1000px; margin: 0 auto;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary);">Engineering Build Plan</h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Mark steps complete to update persistent project progress.</p>
+            </div>
+            <span id="plan-progress-pill" class="tag tag-cyan" style="font-size: 13px; padding: 6px 14px;">
+              {{ project.build_progress_percent }}% Completed
+            </span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-track" style="height: 8px; margin-bottom: 24px;">
+            <div class="progress-bar" id="workspace-progress-bar" style="width: {{ project.build_progress_percent }}%;"></div>
+          </div>
+
+          <!-- Step Cards -->
+          <div id="build-steps-list" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px;">
+            {% for step in project.build_plan %}
+            <div class="step-card {% if step.status == 'completed' %}completed{% endif %}" id="card-step-{{ step.step_number }}">
+              <div class="step-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span class="step-badge">STEP 0{{ step.step_number }}</span>
+                  <span style="font-size: 15px; font-weight: 700; color: var(--text-primary);">{{ step.title }}</span>
+                </div>
+                <button class="btn {% if step.status == 'completed' %}btn-outline{% else %}btn-primary{% endif %}" 
+                        id="btn-step-{{ step.step_number }}" 
+                        onclick="toggleStepComplete({{ step.step_number }}, {% if step.status == 'completed' %}false{% else %}true{% endif %})">
+                  {% if step.status == 'completed' %}✔ Completed (Undo){% else %}Mark Complete &rarr;{% endif %}
+                </button>
+              </div>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">{{ step.description }}</p>
+              <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 16px;">
+                <span><strong>Required Components:</strong> {{ step.required_components|join:", " }}</span>
+                <span><strong>Expected Result:</strong> {{ step.expected_result }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <button class="btn btn-outline" onclick="switchSection('ai-assistant')" style="width: 100%; padding: 12px;">
+            Next Stage: Open AI Assistant & Voice Chat &rarr;
+          </button>
+        </div>
+
+        <!-- 6. SECTION: AI ASSISTANT -->
+        <div class="workspace-section" id="sec-ai-assistant" style="display: none; height: 100%;">
+          <div style="display: flex; flex-direction: column; height: 100%; max-width: 860px; margin: 0 auto; padding: 20px;">
+            
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 20px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-weight: 700; font-size: 14px; color: var(--text-primary);">Project AI Assistant &bull; Thoufeeq Ahmed</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Project-aware intelligence with direct architecture modification capabilities.</div>
+              </div>
+              <span class="tag tag-cyan">Online</span>
+            </div>
+
+            <div class="chat-history" id="workspace-chat-history" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 10px 0;">
+              {% for msg in project.messages.all %}
+              <div class="message-bubble message-{{ msg.role }}">
+                <div>{{ msg.content }}</div>
+                <div class="message-meta">{% if msg.role == 'assistant' %}Thoufeeq Ahmed AI{% else %}You{% endif %}</div>
+              </div>
+              {% empty %}
+              <div class="message-bubble message-assistant">
+                <div>{{ assistant_intro }} I am loaded with the complete context of '{{ project.title }}'. Ask me anything or request architecture modifications (e.g. 'Add mobile application').</div>
+                <div class="message-meta">Thoufeeq Ahmed AI</div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Modification Prompt Chips -->
+            <div style="display: flex; gap: 6px; overflow-x: auto; padding: 8px 0; border-top: 1px solid var(--border-subtle);">
+              <button class="btn btn-outline" style="font-size: 11px; white-space: nowrap;" onclick="sendAssistantQuery('Explain the first thing I should build')">What to build first?</button>
+              <button class="btn btn-outline" style="font-size: 11px; white-space: nowrap;" onclick="sendAssistantQuery('Add a mobile companion application')">+ Add Mobile App</button>
+              <button class="btn btn-outline" style="font-size: 11px; white-space: nowrap;" onclick="sendAssistantQuery('Add Zero-Trust authentication service')">+ Add Auth</button>
+              <button class="btn btn-outline" style="font-size: 11px; white-space: nowrap;" onclick="sendAssistantQuery('What are the key engineering risks?')">Explain Risks</button>
+            </div>
+
+            <!-- Input Bar with Voice -->
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <input type="text" id="assistant-input" class="chat-input" placeholder="Ask questions or modify project (e.g. 'Add mobile application')...">
+              <button class="voice-btn" id="btn-assistant-voice" onclick="toggleAssistantVoice()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+              <button class="btn btn-primary" onclick="submitAssistantMessage()">Send</button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="{% static 'js/dna_canvas.js' %}"></script>
+
+<script>
+  const PROJECT_ID = {{ project.id }};
+  let dnaCanvas = null;
+  let voiceOutputEnabled = true;
+
+  // Initialize Canvas
+  document.addEventListener("DOMContentLoaded", () => {
+    const canvasEl = document.getElementById("dna-canvas-element");
+    if (canvasEl && typeof DNACanvas !== 'undefined') {
+      dnaCanvas = new DNACanvas(canvasEl, (selected) => {
+        openInspector(selected);
+      });
+      loadCanvasData();
+    }
+
+    // Enter key on assistant input
+    document.getElementById("assistant-input")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitAssistantMessage();
+    });
+  });
+
+  async function loadCanvasData() {
+    try {
+      const res = await fetch(`/api/projects/${PROJECT_ID}/`);
+      const data = await res.json();
+      if (dnaCanvas && data.components) {
+        dnaCanvas.setData({
+          nodes: data.components,
+          edges: data.architecture_data?.edges || []
+        });
+      }
+    } catch(e) {
+      console.warn("Error loading canvas data:", e);
+    }
+  }
+
+  function switchSection(secId) {
+    document.querySelectorAll(".workspace-section").forEach(s => s.style.display = "none");
+    document.querySelectorAll(".stage-nav-pill").forEach(p => p.classList.remove("active"));
+
+    const targetSec = document.getElementById(`sec-${secId}`);
+    if (targetSec) {
+      targetSec.style.display = (secId === 'digital-dna' || secId === 'ai-assistant') ? 'flex' : 'block';
+    }
+
+    event?.target?.closest(".stage-nav-pill")?.classList.add("active");
+
+    if (secId === 'digital-dna' && dnaCanvas) {
+      setTimeout(() => {
+        dnaCanvas.handleResize();
+        loadCanvasData();
+      }, 50);
+    }
+  }
+
+  // Synthesize Project Action
+  async function synthesizeProject() {
+    const btnText = document.getElementById("synthesize-btn-text");
+    btnText.textContent = "Synthesizing Architecture...";
+
+    try {
+      const res = await fetch(`/api/projects/${PROJECT_ID}/synthesize/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        btnText.textContent = "Re-Synthesize Architecture";
+        document.getElementById("synthesis-badge").textContent = "SYNTHESIS COMPLETE";
+        alert("Project architecture synthesized! Moving to System Architecture view.");
+        switchSection('architecture');
+        loadCanvasData();
+      } else {
+        alert(data.error || "Synthesis failed.");
+        btnText.textContent = "Synthesize Project";
+      }
+    } catch(e) {
+      alert("Error synthesizing project.");
+      btnText.textContent = "Synthesize Project";
+    }
+  }
+
+  // Toggle Step Completion (Real Database Persistence)
+  async function toggleStepComplete(stepNumber, isCompleted) {
+    try {
+      const res = await fetch(`/api/projects/${PROJECT_ID}/build-step/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          step_number: stepNumber,
+          completed: isCompleted
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        // Update card styles
+        const card = document.getElementById(`card-step-${stepNumber}`);
+        const btn = document.getElementById(`btn-step-${stepNumber}`);
+        if (isCompleted) {
+          card?.classList.add("completed");
+          if (btn) {
+            btn.className = "btn btn-outline";
+            btn.innerHTML = "✔ Completed (Undo)";
+            btn.onclick = () => toggleStepComplete(stepNumber, false);
+          }
+        } else {
+          card?.classList.remove("completed");
+          if (btn) {
+            btn.className = "btn btn-primary";
+            btn.innerHTML = "Mark Complete &rarr;";
+            btn.onclick = () => toggleStepComplete(stepNumber, true);
+          }
+        }
+
+        // Update progress bar
+        const pct = data.build_progress;
+        document.getElementById("workspace-progress-bar").style.width = `${pct}%`;
+        document.getElementById("plan-progress-pill").textContent = `${pct}% Completed`;
+      }
+    } catch(e) {
+      console.error(e);
+      alert("Could not update step status.");
+    }
+  }
+
+  // Inspector Drawer
+  function openInspector(node) {
+    const drawer = document.getElementById("node-inspector");
+    if (!drawer || !node) return;
+
+    document.getElementById("inspector-node-name").textContent = node.name || "Component";
+    document.getElementById("inspector-node-category").textContent = node.category || "Processing";
+    document.getElementById("inspector-node-purpose").textContent = node.purpose || "Domain responsibility";
+    document.getElementById("inspector-node-desc").textContent = node.description || "";
+
+    document.getElementById("inspector-inputs").innerHTML = (node.inputs || []).map(i => `<span class="tag">${i}</span>`).join("") || '<span class="tag">Inbound Stream</span>';
+    document.getElementById("inspector-outputs").innerHTML = (node.outputs || []).map(o => `<span class="tag">${o}</span>`).join("") || '<span class="tag">Processed State</span>';
+    document.getElementById("inspector-tech").innerHTML = (node.technologies || []).map(t => `<span class="tag tag-cyan">${t}</span>`).join("");
+
+    drawer.classList.add("open");
+  }
+
+  function closeInspector() {
+    document.getElementById("node-inspector")?.classList.remove("open");
+  }
+
+  // Assistant & Modification
+  function sendAssistantQuery(text) {
+    document.getElementById("assistant-input").value = text;
+    submitAssistantMessage();
+  }
+
+  async function submitAssistantMessage() {
+    const input = document.getElementById("assistant-input");
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    input.value = "";
+    appendMessage("user", msg);
+
+    try {
+      const res = await fetch(`/api/projects/${PROJECT_ID}/assistant/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        appendMessage("assistant", data.reply);
+        speakText(data.reply);
+
+        if (data.modified) {
+          // Project was modified in database! Reload canvas and workspace
+          loadCanvasData();
+          alert("Project DNA updated by AI! Digital DNA and Architecture refreshed.");
+        }
+      } else {
+        appendMessage("assistant", "Error processing request.");
+      }
+    } catch(e) {
+      appendMessage("assistant", "Connection error. Please try again.");
+    }
+  }
+
+  function appendMessage(role, text) {
+    const history = document.getElementById("workspace-chat-history");
+    const div = document.createElement("div");
+    div.className = `message-bubble message-${role}`;
+    div.innerHTML = `<div>${text}</div><div class="message-meta">${role === 'assistant' ? 'Thoufeeq Ahmed AI' : 'You'}</div>`;
+    history.appendChild(div);
+    history.scrollTop = history.scrollHeight;
+  }
+
+  // Voice Interaction
+  let assistantRecognition = null;
+  let isListening = false;
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRec) {
+    assistantRecognition = new SpeechRec();
+    assistantRecognition.onresult = (e) => {
+      document.getElementById("assistant-input").value = e.results[0][0].transcript;
+      submitAssistantMessage();
+      toggleAssistantVoice();
+    };
+    assistantRecognition.onerror = () => toggleAssistantVoice();
+    assistantRecognition.onend = () => toggleAssistantVoice();
+  }
+
+  function toggleAssistantVoice() {
+    if (!assistantRecognition) return alert("Speech recognition not supported in browser.");
+    const btn = document.getElementById("btn-assistant-voice");
+    if (!isListening) {
+      assistantRecognition.start();
+      isListening = true;
+      btn.classList.add("recording");
+    } else {
+      assistantRecognition.stop();
+      isListening = false;
+      btn.classList.remove("recording");
+    }
+  }
+
+  function toggleVoiceOutput() {
+    voiceOutputEnabled = !voiceOutputEnabled;
+    document.getElementById("btn-toggle-voice").textContent = voiceOutputEnabled ? "Voice On" : "Muted";
+  }
+
+  function speakText(text) {
+    if (!voiceOutputEnabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/[*#`_~[\]()]/g, '');
+    const utter = new SpeechSynthesisUtterance(clean);
+    utter.rate = 1.0;
+    utter.pitch = 0.95;
+    window.speechSynthesis.speak(utter);
+  }
+</script>
+
+</body>
+</html>

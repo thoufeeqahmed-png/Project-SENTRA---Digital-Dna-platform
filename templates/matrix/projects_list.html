@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Projects // SYNTHEX Project DNA Matrix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/workspace.css' %}">
+</head>
+
+<body style="height: 100vh; overflow-y: auto;">
+
+  <div class="app-container" style="display: flex; flex-direction: column;">
+    <header class="app-header">
+      <div class="brand-section">
+        <a href="/" style="text-decoration: none; color: inherit;" class="brand-logo">
+          <div class="logo-badge">DNA</div>
+          <div class="brand-titles">
+            <div class="brand-title">SYNTHEX // DNA MATRIX</div>
+            <div class="brand-sub">Laboratory Directory</div>
+          </div>
+        </a>
+      </div>
+      <div class="header-actions">
+        <a href="/" class="btn btn-primary" style="text-decoration: none;">+ New Project</a>
+      </div>
+    </header>
+
+    <main style="max-width: 1080px; margin: 40px auto; padding: 0 20px; width: 100%;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+        <div>
+          <h1 style="font-size: 24px; font-weight: 800; color: var(--text-primary);">All Projects in Laboratory</h1>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Explore persistent project
+            workspaces, digital architectures, and build plans.</p>
+        </div>
+        <span class="tag tag-cyan">{{ projects|length }} Total Projects</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+        {% for p in projects %}
+        <div
+          style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span class="tag" style="font-size: 10px;">{{ p.project_type }}</span>
+              <span class="score-tag">{{ p.feasibility_score }}% Feasibility</span>
+            </div>
+            <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">{{ p.title }}
+            </h2>
+            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+              {{ p.problem_statement|truncatechars:120 }}
+            </p>
+          </div>
+
+          <div>
+            <div
+              style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+              <span>Build Progress</span>
+              <span style="font-family: var(--font-mono); color: var(--accent-cyan);">{{ p.build_progress_percent
+                }}%</span>
+            </div>
+            <div class="progress-track" style="height: 6px; margin-bottom: 14px;">
+              <div class="progress-bar" style="width: {{ p.build_progress_percent }}%;"></div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; color: var(--text-muted);">{{ p.created_at|date:"M d, Y" }}</span>
+              <a href="/projects/{{ p.id }}/" class="btn btn-outline"
+                style="text-decoration: none; font-size: 11px; padding: 5px 12px;">
+                Open Workspace &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
+          No projects found. <a href="/" style="color: var(--accent-cyan);">Create your first project &rarr;</a>
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+  </div>
+
+</body>
+
+</html>

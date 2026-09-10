@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYNTHEX // Project DNA Matrix &middot; AI Engineering Laboratory</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/workspace.css' %}">
+
+  <style>
+    .home-hero {
+      max-width: 860px;
+      margin: 60px auto 40px auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 0 20px;
+    }
+
+    .home-title {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 30%, #00f0ff 80%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .home-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 600px;
+    }
+
+    .home-card {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .home-prompt-box {
+      width: 100%;
+      height: 110px;
+      background: var(--bg-core);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      padding: 16px;
+      font-family: inherit;
+      font-size: 15px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .home-prompt-box:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+    }
+
+    .chip-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .prompt-chip {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .prompt-chip:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+    }
+
+    .home-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .recent-section {
+      max-width: 860px;
+      margin: 20px auto 60px auto;
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    .recent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .recent-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+
+    .recent-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container" style="display: flex; flex-direction: column; height: 100vh; overflow-y: auto;">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <div class="logo-badge">DNA</div>
+          <div class="brand-titles">
+            <div class="brand-title">SYNTHEX // DNA MATRIX</div>
+            <div class="brand-sub">AI Project Architecture Laboratory &bull; Thoufeeq Ahmed</div>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="/projects/" class="btn btn-outline" style="text-decoration: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          All Projects
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="home-hero">
+      <div class="brand-badge" style="font-size: 11px; padding: 4px 12px;">SYSTEM ARCHITECT V1.0</div>
+      <h1 class="home-title">What do you want to build?</h1>
+      <p class="home-sub">
+        Transform any high-level project vision into an interactive visual Digital DNA, deep system architecture,
+        feasibility matrix, and phased engineering build roadmap.
+      </p>
+
+      <div class="home-card">
+        <label for="home-prompt"
+          style="font-size: 13px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em;">
+          Project Idea or System Requirements:
+        </label>
+        <textarea id="home-prompt" class="home-prompt-box"
+          placeholder="e.g. Build an AI-powered smart irrigation system using soil moisture sensors, weather API, and solenoid valve actuators..."></textarea>
+
+        <!-- Quick Idea Chips -->
+        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">RECOMMENDED ARCHITECTURE PATTERNS:
+        </div>
+        <div class="chip-container">
+          <button class="prompt-chip"
+            onclick="setPrompt('Build an AI-powered smart irrigation system with soil sensors and valve control.')">
+            🌱 Smart Irrigation System
+          </button>
+          <button class="prompt-chip"
+            onclick="setPrompt('Build an AI facial recognition attendance system with liveness detection.')">
+            👤 AI Attendance System
+          </button>
+          <button class="prompt-chip"
+            onclick="setPrompt('Build an on-demand food delivery application with driver dispatch.')">
+            🍔 Food Delivery Platform
+          </button>
+          <button class="prompt-chip"
+            onclick="setPrompt('Build a real-time data analytics telemetry platform with ClickHouse.')">
+            📊 Data Analytics Platform
+          </button>
+          <button class="prompt-chip"
+            onclick="setPrompt('Build an e-commerce platform with Stripe checkout and warehouse inventory.')">
+            🛒 E-Commerce Platform
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="home-actions">
+          <button class="btn btn-outline" id="btn-home-voice" onclick="toggleVoiceInput()" style="padding: 10px 18px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            <span id="voice-text">Voice Input</span>
+          </button>
+
+          <button class="btn btn-primary" id="btn-generate-dna" onclick="submitProjectDNA()"
+            style="padding: 12px 28px; font-size: 14px;">
+            Generate Project DNA &rarr;
+          </button>
+        </div>
+
+        <!-- Live Loading State Indicator -->
+        <div id="loading-indicator"
+          style="display: none; align-items: center; justify-content: center; gap: 12px; padding: 12px; color: var(--accent-cyan); font-weight: 600; font-family: var(--font-mono); font-size: 13px;">
+          <span class="status-dot"></span>
+          <span id="loading-status-text">Understanding your idea and deconstructing Project DNA...</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Recent Projects Section -->
+    <section class="recent-section">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h2
+          style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);">
+          Recent Projects In Laboratory
+        </h2>
+        <a href="/projects/" style="font-size: 12px; color: var(--accent-cyan); text-decoration: none;">View All
+          &rarr;</a>
+      </div>
+
+      <div class="recent-grid">
+        {% for p in recent_projects %}
+        <a href="/projects/{{ p.id }}/" class="recent-card">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">{{ p.title }}</div>
+          <div style="font-size: 11px; color: var(--text-muted);">{{ p.project_type }}</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+            <span class="score-tag">{{ p.feasibility_score }}% Feasibility</span>
+            <span style="font-size: 10px; color: var(--accent-cyan);">Open Workspace &rarr;</span>
+          </div>
+        </a>
+        {% empty %}
+        <div style="color: var(--text-muted); font-size: 12px;">No projects created yet. Start by entering an idea
+          above!</div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function setPrompt(text) {
+      document.getElementById("home-prompt").value = text;
+      document.getElementById("home-prompt").focus();
+    }
+
+    // Voice Input (Web Speech API)
+    let recognition = null;
+    let isListening = false;
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      recognition = new SpeechRec();
+      recognition.lang = 'en-US';
+      recognition.onresult = function (e) {
+        const transcript = e.results[0][0].transcript;
+        document.getElementById("home-prompt").value = transcript;
+        toggleVoiceInput();
+      };
+      recognition.onerror = function () { toggleVoiceInput(); };
+      recognition.onend = function () { toggleVoiceInput(); };
+    }
+
+    function toggleVoiceInput() {
+      if (!recognition) {
+        alert("Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.");
+        return;
+      }
+      const btn = document.getElementById("btn-home-voice");
+      const label = document.getElementById("voice-text");
+      if (!isListening) {
+        try {
+          recognition.start();
+          isListening = true;
+          btn.classList.add("recording");
+          label.textContent = "Listening...";
+        } catch (e) { }
+      } else {
+        try {
+          recognition.stop();
+        } catch (e) { }
+        isListening = false;
+        btn.classList.remove("recording");
+        label.textContent = "Voice Input";
+      }
+    }
+
+    // Submit and Redirect
+    async function submitProjectDNA() {
+      const promptEl = document.getElementById("home-prompt");
+      const idea = promptEl.value.trim();
+      if (!idea) {
+        alert("Please enter a project idea before generating Project DNA.");
+        promptEl.focus();
+        return;
+      }
+
+      const btn = document.getElementById("btn-generate-dna");
+      const loader = document.getElementById("loading-indicator");
+      const statusText = document.getElementById("loading-status-text");
+
+      btn.disabled = true;
+      loader.style.display = "flex";
+
+      const stages = [
+        "Understanding your idea...",
+        "Extracting components, inputs, and outputs...",
+        "Evaluating technical feasibility and stack...",
+        "Generating structured Project DNA...",
+        "Saving project workspace..."
+      ];
+      let stageIdx = 0;
+      const interval = setInterval(() => {
+        stageIdx = (stageIdx + 1) % stages.length;
+        statusText.textContent = stages[stageIdx];
+      }, 1500);
+
+      try {
+        const res = await fetch("/api/projects/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea: idea })
+        });
+        const data = await res.json();
+        clearInterval(interval);
+
+        if (data.success && data.redirect) {
+          statusText.textContent = "Project DNA ready! Redirecting to workspace...";
+          window.location.href = data.redirect;
+        } else {
+          alert(data.error || "Failed to generate Project DNA.");
+          btn.disabled = false;
+          loader.style.display = "none";
+        }
+      } catch (err) {
+        clearInterval(interval);
+        console.error(err);
+        alert("Network or server error while generating Project DNA. Please try again.");
+        btn.disabled = false;
+        loader.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+
+</html>
